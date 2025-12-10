@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Manchester City FC — How To & 2025/26 Stats</title>
+<style>
+  :root{
+    --sky:#75c8ec;       /* team light blue */
+    --sky-dark:#5fb5d6;
+    --white:#ffffff;
+    --navy:#0b3d66;      /* darker contrast */
+    --accent:#6b1d2a;    /* maroon accent */
+    --muted:#f3f8fb;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  body{ margin:0; background:linear-gradient(180deg,var(--muted),#fff 40%); color:#222;}
+  header{
+    background: linear-gradient(90deg,var(--sky),var(--sky-dark));
+    color:var(--white);
+    padding:20px 24px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+  }
+  header img{ height:46px; width:46px; border-radius:6px; object-fit:cover; border:2px solid rgba(255,255,255,0.15);}
+  header h1{ font-size:20px; margin:0; letter-spacing:0.6px;}
+  header p{ margin:0; opacity:0.95; font-size:13px;}
+
+  /* layout */
+  .container{ display:grid; grid-template-columns:260px 1fr; gap:24px; padding:28px; max-width:1200px; margin:18px auto; }
+  nav.side{
+    background:var(--white);
+    border-radius:12px;
+    padding:16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    height:fit-content;
+    position:sticky;
+    top:18px;
+  }
+  .side .logo{ display:flex; gap:10px; align-items:center; margin-bottom:12px;}
+  .side a{
+    display:block;
+    padding:10px 12px;
+    border-radius:8px;
+    color:var(--navy);
+    text-decoration:none;
+    margin-bottom:6px;
+    font-weight:600;
+  }
+  .side a.active, .side a:hover{ background: linear-gradient(90deg,var(--sky),#eaf9ff); color:var(--navy); box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+
+  main.page{
+    min-height:520px;
+    background:var(--white);
+    border-radius:12px;
+    padding:20px;
+    box-shadow: 0 10px 30px rgba(12,30,50,0.05);
+  }
+
+  /* hero */
+  .hero{ display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+  .hero .club-badge{ height:84px; width:84px; border-radius:14px; background:linear-gradient(180deg,var(--white),#f6fcff); display:flex; align-items:center; justify-content:center; border:1px solid rgba(0,0,0,0.04);}
+  .hero h2{ margin:0; font-size:22px;}
+  .meta{ color:#555; font-size:13px; margin-top:6px;}
+
+  /* stats table */
+  .table-wrap{ overflow:auto; margin-top:12px; }
+  table.stats{
+    width:100%;
+    border-collapse:collapse;
+    min-width:800px;
+  }
+  table.stats thead th{
+    text-align:left;
+    padding:10px 12px;
+    font-size:13px;
+    background:linear-gradient(90deg,var(--sky),#eaf9ff);
+    color:var(--navy);
+    position:sticky;
+    top:0;
+    z-index:2;
+  }
+  table.stats tbody tr:nth-child(even){ background: #fbfeff; }
+  table.stats td{ padding:10px 12px; border-bottom:1px solid #eef7fb; vertical-align:middle; font-size:14px;}
+  .pos{ font-weight:700; color:var(--navy); }
+
+  /* small controls */
+  .controls{ display:flex; gap:10px; align-items:center; margin-top:8px; }
+  .controls input[type="search"]{
+    padding:8px 10px; border-radius:8px; border:1px solid #d9eef8; width:260px;
+    outline:none; font-size:14px;
+  }
+  .note{ margin-top:10px; font-size:13px; color:#444; }
+
+  footer{
+    max-width:1200px; margin:18px auto; padding:6px 28px 50px; color:#444; font-size:13px;
+  }
+
+  /* responsive */
+  @media (max-width:900px){
+    .container{ grid-template-columns:1fr; padding:18px; }
+    nav.side{ display:flex; gap:8px; overflow:auto; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" alt="Man City badge" />
+  <div>
+    <h1>Manchester City FC — How To & 2025/26 Stats</h1>
+    <p>Home & stats in a single page. Colors: light blue, white, maroon accent.</p>
+  </div>
+</header>
+
+<div class="container">
+  <nav class="side" aria-label="Main navigation">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Etihad_stadium.jpg/320px-Etihad_stadium.jpg" alt="" style="height:38px;width:56px;object-fit:cover;border-radius:6px;">
+      <div style="line-height:1">
+        <strong style="font-size:14px">Man City — 2025/26</strong><br>
+        <small style="color:#666">Pep Guardiola — Etihad</small>
+      </div>
+    </div>
+
+    <a href="#" id="nav-home" class="active" onclick="showSection('home',event)">Home</a>
+    <a href="#" id="nav-stats" onclick="showSection('stats',event)">Statistics</a>
+    <a href="https://www.mancity.com" target="_blank" rel="noopener">Official site</a>
+    <a href="https://www.espn.com/soccer/team/stats/_/id/382/manchester-city" target="_blank" rel="noopener">Source: ESPN stats</a>
+    <hr style="margin:12px 0;border:none;border-top:1px solid #eef7fb">
+    <small style="color:#666">Tip: use the search box on the Stats page to quickly find a player.</small>
+  </nav>
+
+  <main class="page" id="home">
+    <div class="hero">
+      <div class="club-badge"><img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" alt="badge" style="height:64px;"></div>
+      <div>
+        <h2>How to use this Manchester City page</h2>
+        <div class="meta">This single-file page contains a Home section (this) and a separate Stats section you can open by clicking <strong>Statistics</strong> in the left menu. The stats table shows the current squad and their 2025/26 season numbers (apps, goals, assists) as reported by ESPN and club/Wikipedia sources.</div>
+      </div>
+    </div>
+
+    <section>
+      <h3>Quick guide — ideas for the page</h3>
+      <ul>
+        <li>Use the Stats section to compare players' goals and assists so far this season.</li>
+        <li>Export the table (select the rows and copy) or print the page for presentations.</li>
+        <li>If you want a downloadable CSV or separate HTML files for Home and Stats, tell me and I’ll create them.</li>
+      </ul>
+
+      <div class="note">
+        <strong>Sources & note:</strong> player stats in the Statistics tab were taken from ESPN's Manchester City 2025/26 stats page and squad listings (checked against club/Wikipedia). Stats are shown as published on those sources as of <strong>Dec 8, 2025</strong>. See footer for direct links.
+      </div>
+    </section>
+  </main>
+
+  <main class="page" id="stats" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div>
+        <h2 style="margin:0 0 6px 0">2025/26 — Squad statistics (All competitions)</h2>
+        <div style="color:#555; font-size:13px;">Columns: Apps (P), Goals (G), Assists (A). Data source: ESPN (see footer).</div>
+      </div>
+
+      <div style="text-align:right;">
+        <div class="controls">
+          <input id="searchBox" type="search" placeholder="Search player (name or number)" oninput="filterTable()" />
+        </div>
+        <div style="font-size:12px;color:#666;margin-top:6px">Updated: <strong id="updatedAt">Dec 8, 2025</strong></div>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:12px">
+      <table class="stats" id="playersTable" aria-describedby="table-desc">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Pos</th>
+            <th>Apps (P)</th>
+            <th>Goals (G)</th>
+            <th>Assists (A)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Goalkeepers -->
+          <tr><td>1</td><td>James Trafford</td><td class="pos">GK</td><td>3</td><td>0</td><td>0</td></tr>
+          <tr><td>13</td><td>Marcus Bettinelli</td><td class="pos">GK</td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><td>18</td><td>Stefan Ortega</td><td class="pos">GK</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>25</td><td>Gianluigi Donnarumma</td><td class="pos">GK</td><td>12</td><td>0</td><td>0</td></tr>
+
+          <!-- Defenders -->
+          <tr><td>3</td><td>Rúben Dias</td><td class="pos">CB</td><td>15</td><td>2</td><td>0</td></tr>
+          <tr><td>5</td><td>John Stones</td><td class="pos">CB</td><td>7</td><td>0</td><td>0</td></tr>
+          <tr><td>6</td><td>Nathan Aké</td><td class="pos">CB/LB</td><td>7</td><td>0</td><td>0</td></tr>
+          <tr><td>21</td><td>Rayan Aït-Nouri</td><td class="pos">LB</td><td>4</td><td>0</td><td>0</td></tr>
+          <tr><td>24</td><td>Joško Gvardiol</td><td class="pos">CB/LB</td><td>11</td><td>2</td><td>1</td></tr>
+          <tr><td>45</td><td>Abdukodir Khusanov</td><td class="pos">CB/RB</td><td>4</td><td>0</td><td>0</td></tr>
+          <tr><td>82</td><td>Rico Lewis</td><td class="pos">RB/DM</td><td>6</td><td>0</td><td>1</td></tr>
+
+          <!-- Midfielders -->
+          <tr><td>4</td><td>Tijjani Reijnders</td><td class="pos">CM</td><td>14</td><td>2</td><td>2</td></tr>
+          <tr><td>8</td><td>Mateo Kovačić</td><td class="pos">CM</td><td>1</td><td>0</td><td>0</td></tr>
+          <tr><td>10</td><td>Rayan Cherki</td><td class="pos">AM/RW</td><td>10</td><td>1</td><td>5</td></tr>
+          <tr><td>11</td><td>Jérémy Doku</td><td class="pos">RW/LW</td><td>15</td><td>1</td><td>4</td></tr>
+          <tr><td>14</td><td>Nico González</td><td class="pos">DM/CM</td><td>14</td><td>1</td><td>0</td></tr>
+          <tr><td>16</td><td>Rodri</td><td class="pos">DM</td><td>6</td><td>0</td><td>0</td></tr>
+          <tr><td>20</td><td>Bernardo Silva</td><td class="pos">CM/AM</td><td>15</td><td>0</td><td>2</td></tr>
+          <tr><td>26</td><td>Savinho</td><td class="pos">RW</td><td>11</td><td>0</td><td>1</td></tr>
+          <tr><td>27</td><td>Matheus Nunes</td><td class="pos">CM</td><td>13</td><td>1</td><td>2</td></tr>
+          <tr><td>33</td><td>Nico O'Reilly</td><td class="pos">CM/AM</td><td>14</td><td>1</td><td>3</td></tr>
+          <tr><td>44</td><td>Kalvin Phillips</td><td class="pos">DM/CM</td><td>–</td><td>–</td><td>–</td></tr>
+          <tr><td>52</td><td>Oscar Bobb</td><td class="pos">RW/ST</td><td>9</td><td>0</td><td>1</td></tr>
+
+          <!-- Forwards -->
+          <tr><td>7</td><td>Omar Marmoush</td><td class="pos">ST/W</td><td>9</td><td>0</td><td>1</td></tr>
+          <tr><td>9</td><td>Erling Haaland</td><td class="pos">ST</td><td>15</td><td>15</td><td>3</td></tr>
+          <tr><td>47</td><td>Phil Foden</td><td class="pos">AM/LW</td><td>13</td><td>6</td><td>2</td></tr>
+
+          <!-- Others / youth or not yet appeared -->
+          <tr><td>--- </td><td>Ryan Mcaidoo</td><td class="pos">—</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>--- </td><td>Stephen Mfuni</td><td class="pos">—</td><td>0</td><td>0</td><td>0</td></tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:12px">
+      <strong>Quick explanation:</strong> 'Apps' = matches played (includes as substitute). A dash (–) means the player is registered but had no recorded appearances on the cited source at the snapshot time.
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div style="max-width:1200px;margin:0 auto;display:flex;gap:18px;flex-wrap:wrap;align-items:center;">
+    <div>
+      <strong>Data sources:</strong>
+      <ul style="margin:6px 0 0 18px;">
+        <li><a href="https://www.espn.com/soccer/team/stats/_/id/382/manchester-city" target="_blank" rel="noopener">ESPN — Manchester City 2025/26 stats (apps, goals, assists)</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/2025%E2%80%9326_Manchester_City_F.C._season" target="_blank" rel="noopener">Wikipedia — 2025–26 Manchester City F.C. season (squad & season notes)</a></li>
+        <li><a href="https://www.mancity.com/players/mens" target="_blank" rel="noopener">Manchester City — official squad page</a></li>
+      </ul>
+    </div>
+
+    <div style="margin-left:auto;color:#666;font-size:13px">
+      <strong>Snapshot:</strong> stats reflect sources as of Dec 8, 2025.
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Simple SPA-ish section switcher
+  function showSection(id, ev){
+    if(ev) ev.preventDefault();
+    document.querySelectorAll('main.page').forEach(m => m.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    document.querySelectorAll('nav.side a').forEach(a => a.classList.remove('active'));
+    document.getElementById('nav-' + id).classList.add('active');
+  }
+
+  // Basic table filtering by name or number
+  function filterTable(){
+    const q = document.getElementById('searchBox').value.trim().toLowerCase();
+    const rows = document.querySelectorAll('#playersTable tbody tr');
+    if(!q){ rows.forEach(r => r.style.display=''); return; }
+    rows.forEach(r => {
+      const t = (r.children[1].textContent + ' ' + r.children[0].textContent).toLowerCase();
+      r.style.display = t.includes(q) ? '' : 'none';
+    });
+  }
+
+  // small keyboard shortcut: press "s" to go to stats
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 's' && document.activeElement.tagName !== 'INPUT') {
+      showSection('stats');
+      document.getElementById('searchBox').focus();
+    }
+  });
+</script>
+</body>
+</html>

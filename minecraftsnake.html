@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Minecraft-style Snake — Zombie vs Steve</title>
+<style>
+  :root{
+    --bg:#9ed8ff; /* sky */
+    --panel:#0f1724;
+    --accent:#7cc576;
+    --ui-bg:#0b1220;
+  }
+  html,body{ height:100%; margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:linear-gradient(#9ed8ff,#cfeefd 60%, #e6f7ff 100%); color:#0b1220; }
+  .wrap{ max-width:1100px; margin:18px auto; padding:14px; display:grid; gap:12px; align-items:start; }
+  header{ display:flex; gap:12px; align-items:center; }
+  header h1{ margin:0; font-size:20px; color:#08304a; }
+  .controls{ display:flex; gap:8px; align-items:center; margin-left:auto; }
+  button.btn{ background:linear-gradient(180deg,#1f2937,#0b1220); color:#fff; border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; box-shadow:0 6px 18px rgba(3,7,18,0.3); }
+  button.btn.secondary{ background:linear-gradient(180deg,#ffffff,#f0f6ff); color:#08304a; box-shadow:none; font-weight:600; border:1px solid rgba(0,0,0,0.06); }
+  .game-area{ display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+  .canvas-card{ background:linear-gradient(180deg,#f7fdff,#f3fbff); padding:12px; border-radius:12px; box-shadow:0 10px 30px rgba(6,18,35,0.06);}
+  canvas { display:block; background:transparent; border-radius:6px; image-rendering:pixelated; }
+
+  /* Limit canvas CSS size so it never forces vertical scrolling */
+  /* Reserve space for header/footer/sidebar by subtracting from 100vh */
+  canvas {
+    max-width: 100%;
+    max-height: calc(100vh - 180px); /* change 180px if your header/footer area is different */
+    width: auto;
+    height: auto;
+  }
+
+  .sidebar{ min-width:260px; max-width:320px; background:#ffffffb8; padding:12px; border-radius:12px; box-shadow:0 10px 30px rgba(6,18,35,0.06);}
+  .meta{ font-size:13px; color:#053244; }
+  .kbd{ display:inline-block; background:#e6f7ff; border-radius:6px; padding:4px 8px; font-weight:700; margin-left:6px; color:#08304a; border:1px solid rgba(0,0,0,0.04); }
+
+  /* on-screen controls (mobile) */
+  .dpad{ display:none; gap:6px; margin-top:12px; }
+  .dpad button{ width:56px; height:56px; border-radius:10px; font-size:20px; background:#ffffff; border:1px solid rgba(0,0,0,0.06); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+
+  @media (max-width:720px){
+    .wrap{ padding:12px; }
+    .dpad{ display:flex; gap:6px; margin-top:12px; }
+    .canvas-card{ width:100%; }
+    .sidebar{ width:100%; }
+    /* slightly more reserved vertical space on small screens */
+    canvas { max-height: calc(100vh - 200px); }
+  }
+
+  footer{ text-align:center; color:#0b1224; font-size:13px; margin-top:6px; opacity:0.9; }
+  small.note{ display:block; color:#0b1224; opacity:0.8; margin-top:8px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Minecraft-style Snake — Zombie heads eat Steve heads</h1>
+      <div class="meta">Top-down pixel landscape, snake made of zombie heads, food is Steve heads. Arrow keys or WASD to play.</div>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="btn">Start</button>
+      <button id="pauseBtn" class="btn secondary">Pause</button>
+      <button id="restartBtn" class="btn">Restart</button>
+    </div>
+  </header>
+
+  <section class="game-area">
+    <div class="canvas-card">
+      <!-- Responsive canvas; game will scale -->
+      <canvas id="gameCanvas" width="640" height="640" style="width:640px;height:640px;"></canvas>
+
+      <!-- mobile dpad -->
+      <div class="dpad" id="dpad">
+        <div style="display:flex; gap:6px;">
+          <div></div>
+          <button data-dir="up">↑</button>
+          <div></div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <button data-dir="left">←</button>
+          <button data-dir="down">↓</button>
+          <button data-dir="right">→</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <strong>How to play</strong>
+      <p class="meta">Move the zombie-head snake to eat the Steve heads. Each Steve head you eat grows the snake and increases your score. Don't run into the walls or into your own head.</p>
+
+      <div style="margin-top:10px;">
+        <div><strong>Controls</strong></div>
+        <div style="margin-top:6px;">
+          <span class="kbd">↑</span> / <span class="kbd">W</span> = Up<br>
+          <span class="kbd">↓</span> / <span class="kbd">S</span> = Down<br>
+          <span class="kbd">←</span> / <span class="kbd">A</span> = Left<br>
+          <span class="kbd">→</span> / <span class="kbd">D</span> = Right
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div><strong>Game</strong></div>
+        <div style="margin-top:8px;">
+          <div>Score: <span id="score">0</span></div>
+          <div>Length: <span id="length">1</span></div>
+          <div>Speed: <span id="speedRead">8</span> ticks/sec</div>
+        </div>
+      </div>
+
+      <small class="note">This uses pixel-art style drawing functions to represent Minecraft-like heads; no external images used.</small>
+    </aside>
+  </section>
+
+  <footer>Made for you — have fun! (Mobile controls appear on small screens)</footer>
+</div>
+
+<script>
+/*
+  Single-file Snake game with blocky pixel-art heads.
+  Grid-based. Canvas rendering.
+*/
+
+// --- Configuration ---
+const cellCount = 32;          // play area grid: 32x32 cells
+const baseCanvasSize = 640;    // base logical canvas resolution (pixels)
+let tileScale = Math.floor(baseCanvasSize / cellCount); // pixels per cell (used for drawing)
+const canvas = document.getElementById('gameCanvas');
+canvas.width = tileScale * cellCount;
+canvas.height = tileScale * cellCount;
+const ctx = canvas.getContext('2d');
+
+let initialSpeed = 8;         // ticks per second
+let speed = initialSpeed;
+
+// Game state
+let snake = [];         // array of {x,y}
+let dir = {x:1,y:0};    // current direction
+let nextDir = null;     // queued direction
+let food = null;        // {x,y}
+let score = 0;
+let tickIntervalId = null;
+let running = false;
+
+// DOM
+const scoreEl = document.getElementById('score');
+const lenEl = document.getElementById('length');
+const speedEl = document.getElementById('speedRead');
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const restartBtn = document.getElementById('restartBtn');
+const dpad = document.getElementById('dpad');
+
+// --- Helpers ---
+function rndInt(n){ return Math.floor(Math.random()*n); }
+
+// Initialize or reset the game
+function initGame(){
+  tileScale = Math.floor(baseCanvasSize / cellCount);
+  canvas.width = tileScale * cellCount;
+  canvas.height = tileScale * cellCount;
+
+  snake = [{x: Math.floor(cellCount/2), y: Math.floor(cellCount/2)}]; // single-segment snake
+  dir = {x:1,y:0};
+  nextDir = null;
+  placeFood();
+  score = 0;
+  running = false;
+  updateUI();
+  drawFrame(); // draw background and initial entities
+}
+
+// Place food at random empty cell
+function placeFood(){
+  let tries = 0;
+  while(true){
+    const x = rndInt(cellCount);
+    const y = rndInt(cellCount);
+    if(!snake.some(s => s.x===x && s.y===y)){
+      food = {x,y};
+      return;
+    }
+    if(++tries>500){ // fallback
+      food = {x:0,y:0};
+      return;
+    }
+  }
+}
+
+// Start game loop
+function startGame(){
+  if(running) return;
+  running = true;
+  if(tickIntervalId) clearInterval(tickIntervalId);
+  tickIntervalId = setInterval(tick, 1000 / speed);
+  startBtn.textContent = "Resume";
+}
+
+// Pause
+function pauseGame(){
+  running = false;
+  if(tickIntervalId) clearInterval(tickIntervalId);
+  tickIntervalId = null;
+}
+
+// Restart
+function restartGame(){
+  pauseGame();
+  initGame();
+  startGame();
+}
+
+// Update UI
+function updateUI(){
+  scoreEl.textContent = score;
+  lenEl.textContent = snake.length;
+  speedEl.textContent = speed;
+}
+
+// Game tick: move snake, collision detection, eat food
+function tick(){
+  // apply queued direction if valid (no 180-degree)
+  if(nextDir){
+    if(!(nextDir.x === -dir.x && nextDir.y === -dir.y)){
+      dir = nextDir;
+    }
+    nextDir = null;
+  }
+
+  const head = {...snake[0]};
+  head.x += dir.x;
+  head.y += dir.y;
+
+  // wall collision (game over)
+  if(head.x < 0 || head.x >= cellCount || head.y < 0 || head.y >= cellCount){
+    gameOver();
+    return;
+  }
+
+  // self collision
+  if(snake.some(seg => seg.x === head.x && seg.y === head.y)){
+    gameOver();
+    return;
+  }
+
+  // move
+  snake.unshift(head);
+
+  // eat?
+  if(head.x === food.x && head.y === food.y){
+    score += 1;
+    placeFood();
+  } else {
+    snake.pop();
+  }
+
+  updateUI();
+  drawFrame();
+}
+
+// Game over
+function gameOver(){
+  pauseGame();
+  drawFrame();
+  // flash game over overlay
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#fff';
+  ctx.font = Math.floor(tileScale*1.4) + "px sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('Game Over', canvas.width/2, canvas.height/2 - 8);
+  ctx.font = Math.floor(tileScale*0.7) + "px sans-serif";
+  ctx.fillText('Press Restart or Start to play again', canvas.width/2, canvas.height/2 + tileScale);
+}
+
+// --- Drawing functions ---
+function drawBackground(){
+  // sky gradient (top)
+  const g = ctx.createLinearGradient(0,0,0,canvas.height*0.6);
+  g.addColorStop(0, '#9ed8ff');
+  g.addColorStop(1, '#cfeefd');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,canvas.width, Math.floor(canvas.height*0.6));
+
+  // clouds (pixelated)
+  for(let i=0;i<10;i++){
+    const w = rndInt(6)+6;
+    const h = rndInt(2)+2;
+    const px = rndInt(cellCount-w);
+    const py = rndInt(Math.floor(cellCount*0.12));
+    drawBlockyCloud(px, py, w, h);
+  }
+
+  // ground tiles start at a row
+  const groundStartRow = Math.floor(cellCount*0.45);
+  for(let y = groundStartRow; y < cellCount; y++){
+    for(let x = 0; x < cellCount; x++){
+      const screenX = x*tileScale, screenY = y*tileScale;
+      if(y === groundStartRow){
+        drawGrassTile(screenX, screenY, tileScale);
+      } else {
+        drawDirtTile(screenX, screenY, tileScale);
+      }
+    }
+  }
+
+  // occasional trees on grass row
+  for(let i=0;i<6;i++){
+    const x = rndInt(cellCount);
+    const y = groundStartRow - 1;
+    drawTreeAt(x*tileScale, y*tileScale - tileScale*1.5);
+  }
+}
+
+function drawBlockyCloud(cellX, cellY, w, h){
+  ctx.fillStyle = '#ffffff';
+  const px = cellX*tileScale, py = cellY*tileScale;
+  for(let yy=0; yy<h; yy++){
+    for(let xx=0; xx<w; xx++){
+      if(Math.random() < 0.12 && (xx===0||xx===w-1)) continue;
+      ctx.fillRect(px + xx*tileScale, py + yy*tileScale, tileScale, tileScale);
+      ctx.fillStyle = 'rgba(0,0,0,0.02)';
+      ctx.fillRect(px + xx*tileScale, py + yy*tileScale + tileScale*0.75, tileScale, tileScale*0.25);
+      ctx.fillStyle = '#ffffff';
+    }
+  }
+}
+
+function drawGrassTile(x,y,s){
+  ctx.fillStyle = '#53a84a'; ctx.fillRect(x,y,s,s);
+  ctx.fillStyle = '#3f8a33';
+  for(let i=0;i<6;i++){
+    const rx = Math.floor(Math.random()* (s-4));
+    const ry = Math.floor(Math.random()* (s-6));
+    ctx.fillRect(x+rx, y+ry, 2, 2);
+  }
+  ctx.fillStyle = '#8b5a2b';
+  ctx.fillRect(x, y + s*0.66, s, Math.ceil(s*0.34));
+}
+
+function drawDirtTile(x,y,s){
+  ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x,y,s,s);
+  ctx.fillStyle = '#734923';
+  for(let i=0;i<4;i++){
+    const rx = Math.floor(Math.random()* (s-6));
+    const ry = Math.floor(Math.random()* (s-6));
+    ctx.fillRect(x+rx, y+ry, 2, 2);
+  }
+}
+
+function drawTreeAt(x,y){
+  ctx.fillStyle = '#6b3e1e';
+  const tw = tileScale * 0.6;
+  ctx.fillRect(x+tileScale*0.4, y+tileScale*2, tw, tileScale*2);
+  ctx.fillStyle = '#29712a';
+  const cx = x - tileScale;
+  const cy = y;
+  for(let yy=0; yy<3; yy++){
+    for(let xx=0; xx<5; xx++){
+      ctx.fillRect(cx + xx*tileScale*0.9, cy + yy*tileScale*0.9, tileScale, tileScale);
+    }
+  }
+}
+
+function drawSteveHeadAt(gridX, gridY, size){
+  const px = gridX * tileScale, py = gridY * tileScale;
+  const skin = '#e2b085';
+  const hair = '#443122';
+  const eye = '#1f2b2f';
+  const mouth = '#8b4b3a';
+  ctx.fillStyle = skin;
+  ctx.fillRect(px, py, size, size);
+  ctx.fillStyle = hair;
+  ctx.fillRect(px, py, size, size * 0.25);
+  ctx.fillRect(px, py + size*0.25, size*0.18, size*0.45);
+  ctx.fillStyle = eye;
+  const ex = Math.floor(size*0.28);
+  const ey = Math.floor(size*0.42);
+  ctx.fillRect(px+ex, py+ey, Math.max(1,Math.floor(size*0.14)), Math.max(1,Math.floor(size*0.14)));
+  ctx.fillRect(px + Math.floor(size*0.62), py+ey, Math.max(1,Math.floor(size*0.14)), Math.max(1,Math.floor(size*0.14)));
+  ctx.fillStyle = mouth;
+  ctx.fillRect(px + Math.floor(size*0.42), py + Math.floor(size*0.7), Math.max(1,Math.floor(size*0.16)), Math.max(1,Math.floor(size*0.08)));
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.strokeRect(px+0.5,py+0.5,size-1,size-1);
+}
+
+function drawZombieHeadAt(gridX, gridY, size){
+  const px = gridX * tileScale, py = gridY * tileScale;
+  const skin = '#588e5f';
+  const dark = '#2f5038';
+  const mouth = '#13332b';
+  ctx.fillStyle = skin; ctx.fillRect(px, py, size, size);
+  ctx.fillStyle = dark; ctx.fillRect(px, py, size, Math.floor(size*0.22));
+  ctx.fillStyle = '#a8ffb9';
+  ctx.fillRect(px + Math.floor(size*0.25), py + Math.floor(size*0.36), Math.max(1,Math.floor(size*0.14)), Math.max(1,Math.floor(size*0.14)));
+  ctx.fillRect(px + Math.floor(size*0.60), py + Math.floor(size*0.36), Math.max(1,Math.floor(size*0.14)), Math.max(1,Math.floor(size*0.14)));
+  ctx.fillStyle = mouth;
+  ctx.fillRect(px + Math.floor(size*0.35), py + Math.floor(size*0.65), Math.max(1,Math.floor(size*0.3)), Math.max(1,Math.floor(size*0.1)));
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.strokeRect(px+0.5,py+0.5,size-1,size-1);
+}
+
+function drawFrame(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBackground();
+  if(food){
+    drawSteveHeadAt(food.x, food.y, tileScale);
+  }
+  for(let i=0;i<snake.length;i++){
+    const seg = snake[i];
+    drawZombieHeadAt(seg.x, seg.y, tileScale);
+    if(i===0){
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.strokeRect(seg.x*tileScale + 1, seg.y*tileScale + 1, tileScale-2, tileScale-2);
+    }
+  }
+}
+
+// --- Input handling ---
+window.addEventListener('keydown', (e) => {
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D'].includes(e.key)){
+    e.preventDefault();
+  }
+  switch(e.key){
+    case 'ArrowUp': case 'w': case 'W': queueDir(0,-1); break;
+    case 'ArrowDown': case 's': case 'S': queueDir(0,1); break;
+    case 'ArrowLeft': case 'a': case 'A': queueDir(-1,0); break;
+    case 'ArrowRight': case 'd': case 'D': queueDir(1,0); break;
+    case ' ': // space to pause
+      if(running) pauseGame(); else startGame();
+      break;
+  }
+});
+
+function queueDir(x,y){
+  nextDir = {x,y};
+}
+
+// dpad buttons (mobile)
+dpad.querySelectorAll('button').forEach(b => {
+  b.addEventListener('touchstart', (e) => { e.preventDefault(); const d = b.dataset.dir; handleDpad(d); }, {passive:false});
+  b.addEventListener('mousedown', () => handleDpad(b.dataset.dir));
+});
+function handleDpad(dirName){
+  switch(dirName){
+    case 'up': queueDir(0,-1); break;
+    case 'down': queueDir(0,1); break;
+    case 'left': queueDir(-1,0); break;
+    case 'right': queueDir(1,0); break;
+  }
+}
+
+// Hook up buttons
+startBtn.addEventListener('click', ()=>{ startGame(); });
+pauseBtn.addEventListener('click', ()=>{ pauseGame(); });
+restartBtn.addEventListener('click', ()=>{ restartGame(); });
+
+// allow clicking the canvas to start/resume
+canvas.addEventListener('click', ()=>{ if(!running) startGame(); });
+
+// --- Responsive sizing: Ensure the canvas CSS size is a square that fits available width & height
+function resizeCanvasCSS(){
+  // Adjust these if your header/footer or surrounding padding are different
+  const horizontalPadding = 60; // total horizontal padding/margins around canvas
+  const reservedVertical = 180;  // reserve space for header/footer/sidebar (matches CSS calc)
+  const containerMaxWidth = 1100;
+
+  const availableWidth = Math.min(window.innerWidth - horizontalPadding, containerMaxWidth);
+  const availableHeight = window.innerHeight - reservedVertical;
+
+  const cssSize = Math.max(280, Math.min(availableWidth, availableHeight)); // clamp between 280 and available
+  canvas.style.width = cssSize + 'px';
+  canvas.style.height = cssSize + 'px';
+}
+
+// --- Initialization ---
+initGame();
+drawFrame();
+resizeCanvasCSS();
+window.addEventListener('resize', () => { resizeCanvasCSS(); });
+
+</script>
+</body>
+</html>

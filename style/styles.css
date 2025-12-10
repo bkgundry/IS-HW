@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: rgb(129, 151, 151);
+    background-color: maroon;
+}
+
+h1 {
+    font-size: 40px;
+    text-align: center;
+    color: cornsilk
+}
+
+h2 {
+    color: cornsilk;
+}
+
+h3 {
+    color: lightblue;
+}
+
+li {
+    font-size: 14px;
+    font-style: italic;
+}
+
+a {
+    color: lightblue;
+    text-decoration: wavy underline;
+    font-weight: bold;
+    text-align: right;
+}
+
+.override {
+    font-weight: normal;
+    color: yellow;
+    text-decoration: none;
+}
+
+.bold {
+    font-weight: bold;
+}
